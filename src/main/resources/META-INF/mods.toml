@@ -1,0 +1,17 @@
+modLoader="javafml"
+
+loaderVersion="[31,)"
+
+[[mods]]
+modId="reality_anchor"
+version="${file.jarVersion}"
+displayName="Reality Anchor"
+
+# displayURL="http://example.com/"
+# logoFile="examplemod.png"
+
+credits="Dr. Scranton for invention of S.R.A."
+
+authors="3TUSK"
+
+description="Chunk loaders powered by The Foundation."

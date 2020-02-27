@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "AOA",
+        "GEG",
+        "AOA"
+    ],
+    "key": {
+        "A": { "tag": "forge:ingots/gold" },
+        "O": { "item": "minecraft:obsidian" },
+        "E": { "item": "minecraft:ender_pearl" },
+        "G": { "item": "minecraft:prismarine_bricks" }
+    },
+    "result": {
+        "item": "reality_anchor:passive_anchor"
+    }
+}

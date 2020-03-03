@@ -43,7 +43,7 @@ public final class AnchorContainer extends Container {
     final IntReferenceHolder syncedTimer;
 
     public AnchorContainer(int id, IInventory playerInv) {
-        this(TYPE, id, AnchorInv.MOCK, playerInv, IntReferenceHolder.single());
+        this(TYPE, id, new AnchorInv(), playerInv, IntReferenceHolder.single());
     }
 
     public AnchorContainer(ContainerType<?> type, int id, IItemHandler inv, IInventory playerInv, IntReferenceHolder syncedTimer) {

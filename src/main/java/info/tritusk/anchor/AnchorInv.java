@@ -13,59 +13,39 @@ public final class AnchorInv implements IItemHandlerModifiable {
 
     public static final Tag<Item> ANCHOR_FUEL_LIST = new ItemTags.Wrapper(new ResourceLocation("reality_anchor", "anchor_fuel"));
 
-    /**
-     * A placeholder instance of {@link AnchorInv}, used in {@link AnchorContainer}.
-     * 
-     * @see AnchorContainer#Constructor(int, IInventory)
-     */
-    public static final AnchorInv MOCK = new AnchorInv();
-
-    static {
-        MOCK.view = LazyOptional.empty();
-    }
-
     ItemStack content = ItemStack.EMPTY;
 
-    private LazyOptional<IItemHandler> view;
-    
-    public LazyOptional<IItemHandler> view() {
-        if (this.view == null) {
-            this.view = LazyOptional.of(() -> new IItemHandler() {
-
-                @Override
-                public int getSlots() {
-                    return AnchorInv.this.getSlots();
-                }
-
-                @Override
-                public ItemStack getStackInSlot(int slot) {
-                    return AnchorInv.this.getStackInSlot(slot);
-                }
-
-                @Override
-                public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-                    return AnchorInv.this.insertItem(slot, stack, simulate);
-                }
-
-                @Override
-                public ItemStack extractItem(int slot, int amount, boolean simulate) {
-                    return ItemStack.EMPTY; // No we don't support extraction.
-                }
-
-                @Override
-                public int getSlotLimit(int slot) {
-                    return AnchorInv.this.getSlotLimit(slot);
-                }
-
-                @Override
-                public boolean isItemValid(int slot, ItemStack stack) {
-                    return AnchorInv.this.isItemValid(slot, stack);
-                }
-
-            });
+    final LazyOptional<IItemHandler> view = LazyOptional.of(() -> new IItemHandler() {
+        @Override
+        public int getSlots() {
+            return AnchorInv.this.getSlots();
         }
-        return this.view;
-    }
+
+        @Override
+        public ItemStack getStackInSlot(int slot) {
+            return AnchorInv.this.getStackInSlot(slot);
+        }
+
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            return AnchorInv.this.insertItem(slot, stack, simulate);
+        }
+
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            return ItemStack.EMPTY; // No we don't support extraction.
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return AnchorInv.this.getSlotLimit(slot);
+        }
+
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return AnchorInv.this.isItemValid(slot, stack);
+        }
+    });
 
     @Override
     public int getSlots() {

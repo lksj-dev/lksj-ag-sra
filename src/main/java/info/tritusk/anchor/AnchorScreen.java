@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.client.MinecraftForgeClient;
 
 public final class AnchorScreen extends ContainerScreen<AnchorContainer> {
 
@@ -26,6 +27,7 @@ public final class AnchorScreen extends ContainerScreen<AnchorContainer> {
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
         this.font.drawString(this.getTitle().getFormattedText(), 10, 10, 0x404040);
+        this.font.drawString(String.format(MinecraftForgeClient.getLocale(), "Remaining time: %.2f", this.container.syncedTimer.get() / 60F), 72, 32, 0x404040);
     }
 
     @Override

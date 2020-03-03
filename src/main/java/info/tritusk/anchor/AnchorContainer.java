@@ -8,6 +8,7 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.inventory.container.Slot;
+import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.items.IItemHandler;
@@ -21,15 +22,15 @@ public final class AnchorContainer extends Container {
 
         private static final ITextComponent TITLE = new TranslationTextComponent("gui.reality_anchor.title", ObjectArrays.EMPTY_ARRAY);
 
-        private final IItemHandler inv;
+        private final AnchorBlockEntity tile;
 
-        public Provider(IItemHandler inv) {
-            this.inv = inv;
+        public Provider(AnchorBlockEntity tile) {
+            this.tile = tile;
         }
 
         @Override
         public Container createMenu(int id, PlayerInventory playerInv, PlayerEntity player) {
-            return new AnchorContainer(TYPE, id, this.inv, playerInv);
+            return new AnchorContainer(TYPE, id, this.tile.inv, playerInv, this.tile.syncedTime);
         }
 
         @Override
@@ -39,11 +40,13 @@ public final class AnchorContainer extends Container {
         
     }
 
+    final IntReferenceHolder syncedTimer;
+
     public AnchorContainer(int id, IInventory playerInv) {
-        this(TYPE, id, AnchorInv.MOCK, playerInv);
+        this(TYPE, id, AnchorInv.MOCK, playerInv, IntReferenceHolder.single());
     }
 
-    public AnchorContainer(ContainerType<?> type, int id, IItemHandler inv, IInventory playerInv) {
+    public AnchorContainer(ContainerType<?> type, int id, IItemHandler inv, IInventory playerInv, IntReferenceHolder syncedTimer) {
         super(type, id);
         this.addSlot(new SlotItemHandler(inv, 0, 62, 30));
         for (int i = 0; i < 3; ++i) {
@@ -54,6 +57,7 @@ public final class AnchorContainer extends Container {
         for (int i = 0; i < 9; ++i) {
             this.addSlot(new Slot(playerInv, i, 8 + i * 18, 142));
         }
+        this.trackInt(this.syncedTimer = syncedTimer);
     }
 
     @Override

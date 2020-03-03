@@ -8,6 +8,7 @@ import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -22,6 +23,17 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
     private boolean isWorking;
 
     AnchorInv inv = new AnchorInv();
+    final IntReferenceHolder syncedTime = new IntReferenceHolder() {
+        @Override
+        public int get() {
+            return (int) (timeRemain / 1200);
+        }
+
+        @Override
+        public void set(int value) {
+            AnchorBlockEntity.this.timeRemain = value * 1200L;
+        }
+    };
 
     public AnchorBlockEntity() {
         super(Objects.requireNonNull(TYPE, "You forget to initialize field AnchorBlockEntity.TYPE"));
@@ -45,14 +57,22 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
                 world.forceChunk(centerX + xOffset, centerZ + zOffset, load);
             }
         }
+        if (this.type != AnchorType.PASSIVE) {
+            if (load) {
+                PersistAnchorData.readFrom(world).persistAnchorPos.add(this.pos);
+            } else {
+                PersistAnchorData.readFrom(world).persistAnchorPos.remove(this.pos);
+            }
+            
+        }
     }
 
     @Override
     public void tick() {
+        if (this.type == AnchorType.ADMIN) {
+            return;
+        }
         if (!this.world.isRemote) {
-            if (this.type == AnchorType.ADMIN) {
-                return;
-            }
             if (this.isWorking) {
                 if (--this.timeRemain <= 0) {
                     if (this.inv.content.getCount() > 0) {
@@ -77,7 +97,7 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
     @Override
     public void onLoad() {
         super.onLoad();
-        if (this.isWorking && !this.world.isRemote) {
+        if ((this.type == AnchorType.ADMIN || this.isWorking) && !this.world.isRemote) {
             this.doWork((ServerWorld)this.world, true);
         }
     }
@@ -112,7 +132,7 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        if (this.type != AnchorType.ADMIN && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return this.inv.view().cast();
         }
         return super.getCapability(cap, side);

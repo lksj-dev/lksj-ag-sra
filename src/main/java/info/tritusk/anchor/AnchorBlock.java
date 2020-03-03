@@ -29,16 +29,15 @@ public final class AnchorBlock extends Block {
 
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new AnchorBlockEntity(AnchorType.STANDARD);
+        return new AnchorBlockEntity(this.type);
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player,
-            Hand handIn, BlockRayTraceResult rayTrace) {
-        if (!world.isRemote) {
+    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTrace) {
+        if (!world.isRemote && this.type != AnchorType.ADMIN) {
             TileEntity tile = world.getTileEntity(pos);
             if (tile instanceof AnchorBlockEntity) {
-                player.openContainer(new AnchorContainer.Provider(((AnchorBlockEntity)tile).inv));
+                player.openContainer(new AnchorContainer.Provider((AnchorBlockEntity)tile));
                 return ActionResultType.SUCCESS;
             }
             return ActionResultType.PASS;

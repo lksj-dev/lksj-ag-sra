@@ -7,11 +7,17 @@ import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 
-public final class AnchorInv implements IItemHandler {
+public final class AnchorInv implements IItemHandlerModifiable {
 
     public static final Tag<Item> ANCHOR_FUEL_LIST = new ItemTags.Wrapper(new ResourceLocation("reality_anchor", "anchor_fuel"));
 
+    /**
+     * A placeholder instance of {@link AnchorInv}, used in {@link AnchorContainer}.
+     * 
+     * @see AnchorContainer#Constructor(int, IInventory)
+     */
     public static final AnchorInv MOCK = new AnchorInv();
 
     static {
@@ -111,6 +117,13 @@ public final class AnchorInv implements IItemHandler {
     @Override
     public boolean isItemValid(int slot, ItemStack stack) {
         return ANCHOR_FUEL_LIST.contains(stack.getItem());
+    }
+
+    @Override
+    public void setStackInSlot(int slot, ItemStack stack) {
+        if (this.isItemValid(slot, stack)) {
+            this.content = stack;
+        }
     }
 
 }

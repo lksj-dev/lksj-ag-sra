@@ -18,9 +18,10 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
     public static TileEntityType<?> TYPE;
 
     private AnchorType type = AnchorType.STANDARD; // As a safe-guard measure, preventing null
-    private AnchorInv inv = new AnchorInv();
     private long timeRemain;
     private boolean isWorking;
+
+    AnchorInv inv = new AnchorInv();
 
     public AnchorBlockEntity() {
         super(Objects.requireNonNull(TYPE, "You forget to initialize field AnchorBlockEntity.TYPE"));

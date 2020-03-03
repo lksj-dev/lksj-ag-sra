@@ -96,7 +96,7 @@ public final class AnchorMod {
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = "reality_anchor", value = Dist.CLIENT)
     public static final class ClientSetup {
         @SubscribeEvent
-        public static void bindScreen(FMLClientSetupEvent event) {
+        public static void setup(FMLClientSetupEvent event) {
             ScreenManager.registerFactory(AnchorContainer.TYPE, AnchorScreen::new);
         }
     }

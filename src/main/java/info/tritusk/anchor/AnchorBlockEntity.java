@@ -62,8 +62,7 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
                 PersistAnchorData.readFrom(world).persistAnchorPos.add(this.pos);
             } else {
                 PersistAnchorData.readFrom(world).persistAnchorPos.remove(this.pos);
-            }
-            
+            } 
         }
     }
 
@@ -91,14 +90,6 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
                     this.doWork((ServerWorld)this.world, true);
                 }
             }
-        }
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        if ((this.type == AnchorType.ADMIN || this.isWorking) && !this.world.isRemote) {
-            this.doWork((ServerWorld)this.world, true);
         }
     }
 

@@ -1,6 +1,5 @@
 package info.tritusk.anchor;
 
-import info.tritusk.anchor.AnchorBlockEntity.SyncedTime;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;

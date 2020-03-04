@@ -24,12 +24,13 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
 
         @Override
         public int get(int index) {
-            return (int) ((timeRemain >>> (index * 8)) & 0x0000_FFFF);
+            return (int) (timeRemain >>> (index * 8));
         }
 
         @Override
         public void set(int index, int value) {
-            this.timeRemain |= ((value & 0x0000_FFFF) << (index * 8));
+            this.timeRemain &= (0xFFFF_FFFF_FFFF_FFFFL ^ (0xFFFFL << (index * 8)));
+            this.timeRemain |= (value << (index * 8));
         }
 
         @Override

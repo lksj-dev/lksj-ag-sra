@@ -4,5 +4,7 @@
     "block.reality_anchor.passive_anchor": "Passive Scranton Reality Anchor",
     "block.reality_anchor.admin_anchor": "Level-4 Scranton Reality Anchor",
 
-    "gui.reality_anchor.title": "S.R.A. Operation Terminal"
+    "gui.reality_anchor.title": "S.R.A. Operation Terminal",
+    "gui.reality_anchor.time_remain_1": "Remaining Time: ",
+    "gui.reality_anchor.time_remain_2": "%.2f h"
 }

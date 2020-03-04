@@ -46,7 +46,7 @@ public final class AnchorContainer extends Container {
         this(TYPE, id, new AnchorInv(), playerInv, new AnchorBlockEntity.SyncedTime());
     }
 
-    public AnchorContainer(ContainerType<?> type, int id, IItemHandler inv, IInventory playerInv, SyncedTime syncedTimer) {
+    public AnchorContainer(ContainerType<?> type, int id, IItemHandler inv, IInventory playerInv, AnchorBlockEntity.SyncedTime syncedTimer) {
         super(type, id);
         this.addSlot(new SlotItemHandler(inv, 0, 26, 30));
         for (int i = 0; i < 3; ++i) {

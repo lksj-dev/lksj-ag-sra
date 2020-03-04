@@ -2,11 +2,12 @@ package info.tritusk.anchor;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.client.MinecraftForgeClient;
 
 public final class AnchorScreen extends ContainerScreen<AnchorContainer> {
 
@@ -27,7 +28,8 @@ public final class AnchorScreen extends ContainerScreen<AnchorContainer> {
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
         this.font.drawString(this.getTitle().getFormattedText(), 10, 10, 0x404040);
-        this.font.drawString(String.format(MinecraftForgeClient.getLocale(), "Remaining time: %.2f hour(s)", this.container.syncedTimer.timeRemain / 72000F), 52, 32, 0x404040);
+        this.font.drawString(I18n.format("gui.reality_anchor.time_remain_1", ObjectArrays.EMPTY_ARRAY), 52, 30, 0x404040);
+        this.font.drawString(I18n.format("gui.reality_anchor.time_remain_2", this.container.syncedTimer.timeRemain / 72000F), 52, 40, 0x404040);
     }
 
     @Override

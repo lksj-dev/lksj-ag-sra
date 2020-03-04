@@ -54,7 +54,7 @@ public final class AnchorInv implements IItemHandlerModifiable {
 
     @Override
     public ItemStack getStackInSlot(int slot) {
-        return slot == 0 ? content.copy() : ItemStack.EMPTY;
+        return slot == 0 ? content : ItemStack.EMPTY;
     }
 
     @Override

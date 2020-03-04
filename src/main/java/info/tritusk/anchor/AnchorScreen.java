@@ -27,7 +27,7 @@ public final class AnchorScreen extends ContainerScreen<AnchorContainer> {
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
         this.font.drawString(this.getTitle().getFormattedText(), 10, 10, 0x404040);
-        this.font.drawString(String.format(MinecraftForgeClient.getLocale(), "Remaining time: %.2f", this.container.syncedTimer.get() / 60F), 72, 32, 0x404040);
+        this.font.drawString(String.format(MinecraftForgeClient.getLocale(), "Remaining time: %.2f hour(s)", this.container.syncedTimer.timeRemain / 72000F), 52, 32, 0x404040);
     }
 
     @Override

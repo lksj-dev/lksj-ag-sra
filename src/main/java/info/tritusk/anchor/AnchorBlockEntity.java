@@ -8,7 +8,7 @@ import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.IntReferenceHolder;
+import net.minecraft.util.IIntArray;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -18,22 +18,32 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
 
     public static TileEntityType<?> TYPE;
 
+    static final class SyncedTime implements IIntArray {
+
+        long timeRemain;
+
+        @Override
+        public int get(int index) {
+            return (int) ((timeRemain >>> (index * 8)) & 0x0000_FFFF);
+        }
+
+        @Override
+        public void set(int index, int value) {
+            this.timeRemain |= ((value & 0x0000_FFFF) << (index * 8));
+        }
+
+        @Override
+        public int size() {
+            return 4;
+        }
+        
+    }
+
     private AnchorType type = AnchorType.STANDARD; // As a safe-guard measure, preventing null
-    private long timeRemain;
     private boolean isWorking;
 
-    AnchorInv inv = new AnchorInv();
-    final IntReferenceHolder syncedTime = new IntReferenceHolder() {
-        @Override
-        public int get() {
-            return (int) (timeRemain / 1200);
-        }
-
-        @Override
-        public void set(int value) {
-            AnchorBlockEntity.this.timeRemain = value * 1200L;
-        }
-    };
+    final AnchorInv inv = new AnchorInv();
+    final SyncedTime timer = new SyncedTime();
 
     public AnchorBlockEntity() {
         super(Objects.requireNonNull(TYPE, "You forget to initialize field AnchorBlockEntity.TYPE"));
@@ -73,10 +83,10 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
         }
         if (!this.world.isRemote) {
             if (this.isWorking) {
-                if (--this.timeRemain <= 0) {
+                if (--this.timer.timeRemain <= 0) {
                     if (this.inv.content.getCount() > 0) {
                         this.inv.content.shrink(1);
-                        this.timeRemain += 864000;
+                        this.timer.timeRemain += 864000;
                     } else {
                         this.isWorking = false;
                         doWork((ServerWorld)this.world, false);
@@ -85,7 +95,7 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
             } else {
                 if (this.inv.content.getCount() > 0) {
                     this.inv.content.shrink(1);
-                    this.timeRemain += 864000;
+                    this.timer.timeRemain += 864000;
                     this.isWorking = true;
                     this.doWork((ServerWorld)this.world, true);
                 }
@@ -104,7 +114,7 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
     @Override
     public CompoundNBT write(CompoundNBT data) {
         data.putInt("Type", this.type.ordinal());
-        data.putLong("TimeRemain", this.timeRemain);
+        data.putLong("TimeRemain", this.timer.timeRemain);
         data.putBoolean("Working", this.isWorking);
         data.put("Inv", this.inv.content.write(new CompoundNBT()));
         return super.write(data);
@@ -116,7 +126,7 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
         int ordinal = data.getInt("Type");
         if (ordinal < 0 || ordinal > 3) ordinal = 0;
         this.type = AnchorType.values()[ordinal];
-        this.timeRemain = data.getLong("TimeRemain");
+        this.timer.timeRemain = data.getLong("TimeRemain");
         this.isWorking = data.getBoolean("Working");
         this.inv.content = ItemStack.read(data.getCompound("Inv"));
     }

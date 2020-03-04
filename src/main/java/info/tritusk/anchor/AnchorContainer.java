@@ -1,5 +1,6 @@
 package info.tritusk.anchor;
 
+import info.tritusk.anchor.AnchorBlockEntity.SyncedTime;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -9,7 +10,6 @@ import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.items.IItemHandler;
@@ -31,7 +31,7 @@ public final class AnchorContainer extends Container {
 
         @Override
         public Container createMenu(int id, PlayerInventory playerInv, PlayerEntity player) {
-            return new AnchorContainer(TYPE, id, this.tile.inv, playerInv, this.tile.syncedTime);
+            return new AnchorContainer(TYPE, id, this.tile.inv, playerInv, this.tile.timer);
         }
 
         @Override
@@ -41,13 +41,13 @@ public final class AnchorContainer extends Container {
         
     }
 
-    final IntReferenceHolder syncedTimer;
+    final AnchorBlockEntity.SyncedTime syncedTimer;
 
     public AnchorContainer(int id, IInventory playerInv) {
-        this(TYPE, id, new AnchorInv(), playerInv, IntReferenceHolder.single());
+        this(TYPE, id, new AnchorInv(), playerInv, new AnchorBlockEntity.SyncedTime());
     }
 
-    public AnchorContainer(ContainerType<?> type, int id, IItemHandler inv, IInventory playerInv, IntReferenceHolder syncedTimer) {
+    public AnchorContainer(ContainerType<?> type, int id, IItemHandler inv, IInventory playerInv, SyncedTime syncedTimer) {
         super(type, id);
         this.addSlot(new SlotItemHandler(inv, 0, 26, 30));
         for (int i = 0; i < 3; ++i) {
@@ -58,7 +58,7 @@ public final class AnchorContainer extends Container {
         for (int i = 0; i < 9; ++i) {
             this.addSlot(new Slot(playerInv, i, 8 + i * 18, 142));
         }
-        this.trackInt(this.syncedTimer = syncedTimer);
+        this.trackIntArray(this.syncedTimer = syncedTimer);
     }
 
     @Override

@@ -24,13 +24,13 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
 
         @Override
         public int get(int index) {
-            return (int) (timeRemain >>> (index * 8));
+            return (int) (timeRemain >>> (index << 3)); // index << 3 == index * 8
         }
 
         @Override
         public void set(int index, int value) {
-            this.timeRemain &= (0xFFFF_FFFF_FFFF_FFFFL ^ (0xFFFFL << (index * 8)));
-            this.timeRemain |= (value << (index * 8));
+            this.timeRemain &= (0xFFFF_FFFF_FFFF_FFFFL ^ (0xFFFFL << (index << 3)));
+            this.timeRemain |= (value << (index << 3)); // same above
         }
 
         @Override
@@ -60,7 +60,7 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
      * @param world the world instance wherein this tile entity locates
      * @param load chunks will be forced if true; otherwise will be unforced
      */
-    private void doWork(ServerWorld world, boolean load) {
+    void doWork(ServerWorld world, boolean load) {
         int centerX = this.pos.getX() >> 4;
         int centerZ = this.pos.getZ() >> 4;
         for (int xOffset = -1; xOffset <= 1; xOffset++) {
@@ -80,6 +80,10 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
     @Override
     public void tick() {
         if (this.type == AnchorType.ADMIN) {
+            if (!this.isWorking) {
+                this.isWorking = true;
+                this.doWork((ServerWorld)this.world, true);
+            }
             return;
         }
         if (!this.world.isRemote) {
@@ -102,14 +106,6 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
                 }
             }
         }
-    }
-
-    @Override
-    public void remove() {
-        if (this.type != AnchorType.PASSIVE && !this.world.isRemote) {
-            PersistAnchorData.readFrom((ServerWorld) this.world).persistAnchorPos.add(this.pos);
-        }
-        super.remove();
     }
 
     @Override

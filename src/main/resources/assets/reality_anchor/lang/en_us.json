@@ -6,5 +6,5 @@
 
     "gui.reality_anchor.title": "S.R.A. Operation Terminal",
     "gui.reality_anchor.time_remain_1": "Remaining Time: ",
-    "gui.reality_anchor.time_remain_2": "%.2f h"
+    "gui.reality_anchor.time_remain_2": "%s h"
 }

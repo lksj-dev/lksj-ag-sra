@@ -58,12 +58,9 @@ public final class AnchorBlock extends Block {
         super.onReplaced(state, world, pos, newState, isMoving);
         if (world instanceof ServerWorld) {
             // TODO what if newState is also an anchor?
-            ServerWorld serverWorld = (ServerWorld) world;
-            serverWorld.forceChunk(pos.getX() >> 4, pos.getZ() >> 4, false);
-            PersistAnchorData.readFrom(serverWorld).persistAnchorPos.remove(pos);
-
             TileEntity tile = world.getTileEntity(pos);
             if (tile instanceof AnchorBlockEntity) {
+                ((AnchorBlockEntity)tile).doWork((ServerWorld) world, false);
                 InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), ((AnchorBlockEntity)tile).inv.content);
             }
         }

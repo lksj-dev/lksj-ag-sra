@@ -60,6 +60,9 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
      * @param world the world instance wherein this tile entity locates
      * @param load chunks will be forced if true; otherwise will be unforced
      */
+    // TODO Use our own ticket
+    // Ref: https://discordapp.com/channels/313125603924639766/454376090362970122/698326591595610155
+    // Forge Discord, #modder-support-115 channel
     void doWork(ServerWorld world, boolean load) {
         int centerX = this.pos.getX() >> 4;
         int centerZ = this.pos.getZ() >> 4;
@@ -67,13 +70,6 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
             for (int zOffset = -1; zOffset <= 1; zOffset++) {
                 world.forceChunk(centerX + xOffset, centerZ + zOffset, load);
             }
-        }
-        if (this.type != AnchorType.PASSIVE) {
-            if (load) {
-                PersistAnchorData.readFrom(world).persistAnchorPos.add(this.pos);
-            } else {
-                PersistAnchorData.readFrom(world).persistAnchorPos.remove(this.pos);
-            } 
         }
     }
 
@@ -106,6 +102,14 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
                 }
             }
         }
+    }
+
+    @Override
+    public void remove() {
+        if (this.world instanceof ServerWorld) {
+            this.doWork((ServerWorld)this.world, false);
+        }
+        super.remove();
     }
 
     @Override

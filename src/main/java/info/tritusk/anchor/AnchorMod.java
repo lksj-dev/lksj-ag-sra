@@ -1,5 +1,8 @@
 package info.tritusk.anchor;
 
+import java.util.HashSet;
+import java.util.Iterator;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -11,21 +14,36 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.Rarity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.GlobalPos;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 
 @Mod("reality_anchor")
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class AnchorMod {
 
+    /*
+     * Collection of locations of known passive/personal anchors,
+     * used for forcing releasing chunk tickets on sevrer shutting down.
+     */
+    public static HashSet<GlobalPos> transientAnchors = new HashSet<>();
+
     public static Block anchorStandard;
     public static Block anchorPersonal;
     public static Block anchorPassive;
     public static Block anchorAdmin;
+
+    public AnchorMod() {
+        MinecraftForge.EVENT_BUS.addListener(AnchorMod::cleanup);
+    }
     
     @SubscribeEvent
     public static void regBlock(RegistryEvent.Register<Block> event) {
@@ -91,6 +109,18 @@ public final class AnchorMod {
         event.getRegistry().register(
             AnchorBlockEntity.TYPE = TileEntityType.Builder.create(AnchorBlockEntity::new, anchorStandard, anchorPersonal, anchorPassive, anchorAdmin).build(null).setRegistryName("reality_anchor", "anchor")            
         );
+    }
+
+    private static void cleanup(FMLServerStoppingEvent event) {
+        for (ServerWorld world : event.getServer().getWorlds()) {
+            for (Iterator<GlobalPos> itr = transientAnchors.iterator(); itr.hasNext();) {
+                GlobalPos pos = itr.next();
+                if (pos.getDimension() == world.dimension.getType()) {
+                    final ChunkPos chunkPos = new ChunkPos(pos.getPos());
+                    world.getChunkProvider().releaseTicket(AnchorBlockEntity.ANCHOR, chunkPos, 4, chunkPos);
+                }
+            }
+        }
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = "reality_anchor", value = Dist.CLIENT)

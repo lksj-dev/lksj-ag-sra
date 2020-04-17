@@ -1,5 +1,6 @@
 package info.tritusk.anchor;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 import net.minecraft.item.ItemStack;
@@ -9,7 +10,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IIntArray;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -17,6 +22,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 public final class AnchorBlockEntity extends TileEntity implements ITickableTileEntity {
 
     public static TileEntityType<?> TYPE;
+
+    public static final TicketType<ChunkPos> ANCHOR = TicketType.create("reality_anchor", Comparator.comparingLong(ChunkPos::asLong));
 
     static final class SyncedTime implements IIntArray {
 
@@ -60,16 +67,11 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
      * @param world the world instance wherein this tile entity locates
      * @param load chunks will be forced if true; otherwise will be unforced
      */
-    // TODO Use our own ticket
-    // Ref: https://discordapp.com/channels/313125603924639766/454376090362970122/698326591595610155
-    // Forge Discord, #modder-support-115 channel
-    void doWork(ServerWorld world, boolean load) {
-        int centerX = this.pos.getX() >> 4;
-        int centerZ = this.pos.getZ() >> 4;
-        for (int xOffset = -1; xOffset <= 1; xOffset++) {
-            for (int zOffset = -1; zOffset <= 1; zOffset++) {
-                world.forceChunk(centerX + xOffset, centerZ + zOffset, load);
-            }
+    static void doWork(ServerWorld world, BlockPos pos, boolean load) {
+        if (load) {
+            world.getChunkProvider().registerTicket(ANCHOR, new ChunkPos(pos), 4, new ChunkPos(pos));
+        } else {
+            world.getChunkProvider().releaseTicket(ANCHOR, new ChunkPos(pos), 4, new ChunkPos(pos));
         }
     }
 
@@ -78,7 +80,7 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
         if (this.type == AnchorType.ADMIN) {
             if (!this.isWorking) {
                 this.isWorking = true;
-                this.doWork((ServerWorld)this.world, true);
+                doWork((ServerWorld)this.world, this.pos, true);
             }
             return;
         }
@@ -90,33 +92,35 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
                         this.timer.timeRemain += 864000;
                     } else {
                         this.isWorking = false;
-                        doWork((ServerWorld)this.world, false);
+                        doWork((ServerWorld)this.world, this.pos, false);
                     }
                 }
             } else {
-                if (this.inv.content.getCount() > 0) {
+                if (this.timer.timeRemain > 0) {
+                    this.isWorking = true;
+                    doWork((ServerWorld)this.world, this.pos, true);
+                } else if (this.inv.content.getCount() > 0) {
                     this.inv.content.shrink(1);
                     this.timer.timeRemain += 864000;
                     this.isWorking = true;
-                    this.doWork((ServerWorld)this.world, true);
+                    doWork((ServerWorld)this.world, this.pos, true);
                 }
             }
         }
     }
 
     @Override
-    public void remove() {
-        if (this.world instanceof ServerWorld) {
-            this.doWork((ServerWorld)this.world, false);
+    public synchronized void onLoad() {
+        super.onLoad();
+        if (this.type.passive) {
+            AnchorMod.transientAnchors.add(GlobalPos.of(this.world.dimension.getType(), this.pos));
         }
-        super.remove();
     }
 
     @Override
     public CompoundNBT write(CompoundNBT data) {
         data.putInt("Type", this.type.ordinal());
         data.putLong("TimeRemain", this.timer.timeRemain);
-        data.putBoolean("Working", this.isWorking);
         data.put("Inv", this.inv.content.write(new CompoundNBT()));
         return super.write(data);
     }
@@ -128,7 +132,6 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
         if (ordinal < 0 || ordinal > 3) ordinal = 0;
         this.type = AnchorType.values()[ordinal];
         this.timer.timeRemain = data.getLong("TimeRemain");
-        this.isWorking = data.getBoolean("Working");
         this.inv.content = ItemStack.read(data.getCompound("Inv"));
     }
 

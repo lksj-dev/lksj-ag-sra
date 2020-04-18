@@ -107,7 +107,7 @@ public final class AnchorMod {
     @SubscribeEvent
     public static void regTile(RegistryEvent.Register<TileEntityType<?>> event) {
         event.getRegistry().register(
-            AnchorBlockEntity.TYPE = TileEntityType.Builder.create(AnchorBlockEntity::new, anchorStandard, anchorPersonal, anchorPassive, anchorAdmin).build(null).setRegistryName("reality_anchor", "anchor")            
+            (AnchorBlockEntity.TYPE = TileEntityType.Builder.create(AnchorBlockEntity::new, anchorStandard, anchorPersonal, anchorPassive, anchorAdmin).build(null)).setRegistryName("reality_anchor", "anchor")            
         );
     }
 

@@ -21,7 +21,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 
 public final class AnchorBlockEntity extends TileEntity implements ITickableTileEntity {
 
-    public static TileEntityType<?> TYPE;
+    public static TileEntityType<AnchorBlockEntity> TYPE;
 
     public static final TicketType<ChunkPos> ANCHOR = TicketType.create("reality_anchor", Comparator.comparingLong(ChunkPos::asLong));
 
@@ -77,16 +77,9 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
 
     @Override
     public void tick() {
-        if (this.type == AnchorType.ADMIN) {
-            if (!this.isWorking) {
-                this.isWorking = true;
-                doWork((ServerWorld)this.world, this.pos, true);
-            }
-            return;
-        }
         if (!this.world.isRemote) {
             if (this.isWorking) {
-                if (--this.timer.timeRemain <= 0) {
+                if (!this.type.perpetual && --this.timer.timeRemain <= 0) {
                     if (this.inv.content.getCount() > 0) {
                         this.inv.content.shrink(1);
                         this.timer.timeRemain += 864000;
@@ -96,7 +89,7 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
                     }
                 }
             } else {
-                if (this.timer.timeRemain > 0) {
+                if (this.type.perpetual || this.timer.timeRemain > 0) {
                     this.isWorking = true;
                     doWork((ServerWorld)this.world, this.pos, true);
                 } else if (this.inv.content.getCount() > 0) {
@@ -119,7 +112,7 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
 
     @Override
     public CompoundNBT write(CompoundNBT data) {
-        data.putInt("Type", this.type.ordinal());
+        data.putString("Type", this.type.name);
         data.putLong("TimeRemain", this.timer.timeRemain);
         data.put("Inv", this.inv.content.write(new CompoundNBT()));
         return super.write(data);
@@ -128,9 +121,7 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
     @Override
     public void read(CompoundNBT data) {
         super.read(data);
-        int ordinal = data.getInt("Type");
-        if (ordinal < 0 || ordinal > 3) ordinal = 0;
-        this.type = AnchorType.values()[ordinal];
+        this.type = AnchorType.find(data.getString("Type"));
         this.timer.timeRemain = data.getLong("TimeRemain");
         this.inv.content = ItemStack.read(data.getCompound("Inv"));
     }

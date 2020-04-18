@@ -34,7 +34,7 @@ public final class AnchorBlock extends Block {
 
     @Override
     public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTrace) {
-        if (!world.isRemote && this.type != AnchorType.ADMIN) {
+        if (!world.isRemote && !this.type.perpetual) {
             TileEntity tile = world.getTileEntity(pos);
             if (tile instanceof AnchorBlockEntity) {
                 player.openContainer(new AnchorContainer.Provider((AnchorBlockEntity)tile));
@@ -48,13 +48,6 @@ public final class AnchorBlock extends Block {
     @SuppressWarnings("deprecation")
     @Override // Oh thanks Androsa reminding me this
     public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
-        // Here is a tricky situation.
-        // In AnchorBlockEntity, it always add its position to the list of persist 
-        // anchors when being removed from the world. However, a block entity
-        // is removed from the world not only because chunk unload but also 
-        // beacuse the host block is replaced. So we need to call super first, 
-        // and then let this method to remove the position from the list.
-        // Yes it sounds reduntdant, but there is no good way around.
         super.onReplaced(state, world, pos, newState, isMoving);
         if (world instanceof ServerWorld) {
             TileEntity tile = world.getTileEntity(pos);

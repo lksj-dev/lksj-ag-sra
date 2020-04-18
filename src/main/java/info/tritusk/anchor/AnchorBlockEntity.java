@@ -128,7 +128,7 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        if (this.type != AnchorType.ADMIN && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        if (!this.type.perpetual && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return this.inv.view.cast();
         }
         return super.getCapability(cap, side);

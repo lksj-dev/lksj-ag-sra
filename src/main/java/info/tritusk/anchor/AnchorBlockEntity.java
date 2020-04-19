@@ -89,7 +89,7 @@ public final class AnchorBlockEntity extends TileEntity implements INameable, IT
                 if (!this.type.perpetual && --this.timer.timeRemain <= 0) {
                     if (this.inv.content.getCount() > 0) {
                         this.inv.content.shrink(1);
-                        this.timer.timeRemain += 864000;
+                        this.timer.timeRemain += AnchorMod.defaultFuelValue.get();
                     } else {
                         this.isWorking = false;
                         doWork((ServerWorld)this.world, this.pos, false);
@@ -102,7 +102,7 @@ public final class AnchorBlockEntity extends TileEntity implements INameable, IT
                 } else if (this.inv.content.getCount() > 0) {
                     if (this.type != AnchorType.PERSONAL || this.world.getServer().getPlayerList().getPlayerByUUID(this.owner) != null) {
                         this.inv.content.shrink(1);
-                        this.timer.timeRemain += 864000;
+                        this.timer.timeRemain += AnchorMod.defaultFuelValue.get();
                         this.isWorking = true;
                         doWork((ServerWorld)this.world, this.pos, true);
                     }

@@ -18,11 +18,14 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 
@@ -41,8 +44,17 @@ public final class AnchorMod {
     public static Block anchorPassive;
     public static Block anchorAdmin;
 
+    public static ForgeConfigSpec.LongValue defaultFuelValue;
+
     public AnchorMod() {
         MinecraftForge.EVENT_BUS.addListener(AnchorMod::cleanup);
+        ForgeConfigSpec.Builder configBuilder = new ForgeConfigSpec.Builder();
+        configBuilder.comment("General options about the Reality Anchor mod").push("general");
+        defaultFuelValue = configBuilder
+            .comment("Number of ticks that one unit of fuel can keep anchor working")
+            .translation("config.reality_anchor.fuel_value")
+            .defineInRange("fuelValue", 12 * 60 * 60 * 20, 0, Long.MAX_VALUE);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, configBuilder.pop().build());
     }
     
     @SubscribeEvent

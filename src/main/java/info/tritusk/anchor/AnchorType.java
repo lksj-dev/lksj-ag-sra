@@ -4,12 +4,12 @@ import java.util.HashMap;
 
 public class AnchorType {
 
+    private static final HashMap<String, AnchorType> LOOKUP = new HashMap<>();
+
     public static final AnchorType STANDARD = new AnchorType("standard", false, false);
     public static final AnchorType PERSONAL = new AnchorType("personal", true, false);
     public static final AnchorType PASSIVE = new AnchorType("passive", true, false);
     public static final AnchorType ADMIN = new AnchorType("admin", false, true);
-
-    private static final HashMap<String, AnchorType> LOOKUP = new HashMap<>();
 
     public final String name;
     public final boolean passive;

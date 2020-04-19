@@ -41,6 +41,9 @@ public final class AnchorBlock extends Block {
             if (tile instanceof AnchorBlockEntity) {
                 if (placer instanceof PlayerEntity) {
                     ((AnchorBlockEntity)tile).owner = ((PlayerEntity)placer).getUniqueID();
+                    if (stack.hasDisplayName()) {
+                        ((AnchorBlockEntity)tile).title = stack.getDisplayName();
+                    }
                 }
             }
         }

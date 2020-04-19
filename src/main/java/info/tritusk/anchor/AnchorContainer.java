@@ -20,7 +20,7 @@ public final class AnchorContainer extends Container {
 
     public static final class Provider implements INamedContainerProvider {
 
-        private static final ITextComponent TITLE = new TranslationTextComponent("gui.reality_anchor.title", ObjectArrays.EMPTY_ARRAY);
+        static final ITextComponent TITLE = new TranslationTextComponent("gui.reality_anchor.title", ObjectArrays.EMPTY_ARRAY);
 
         private final AnchorBlockEntity tile;
 
@@ -35,7 +35,7 @@ public final class AnchorContainer extends Container {
 
         @Override
         public ITextComponent getDisplayName() {
-            return TITLE;
+            return this.tile.getDisplayName();
         }
         
     }

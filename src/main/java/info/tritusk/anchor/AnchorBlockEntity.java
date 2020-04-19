@@ -11,16 +11,19 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IIntArray;
+import net.minecraft.util.INameable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.GlobalPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 
-public final class AnchorBlockEntity extends TileEntity implements ITickableTileEntity {
+public final class AnchorBlockEntity extends TileEntity implements INameable, ITickableTileEntity {
 
     public static TileEntityType<AnchorBlockEntity> TYPE;
 
@@ -52,6 +55,7 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
     private boolean isWorking;
     
     UUID owner = new UUID(0L, 0L);
+    ITextComponent title;
 
     final AnchorInv inv = new AnchorInv();
     final SyncedTime timer = new SyncedTime();
@@ -121,6 +125,9 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
         data.putLong("TimeRemain", this.timer.timeRemain);
         data.put("Inv", this.inv.content.write(new CompoundNBT()));
         data.putUniqueId("Owner", this.owner);
+        if (this.title != null) {
+            data.putString("Title", ITextComponent.Serializer.toJson(this.title));
+        }
         return super.write(data);
     }
 
@@ -131,6 +138,19 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
         this.timer.timeRemain = data.getLong("TimeRemain");
         this.inv.content = ItemStack.read(data.getCompound("Inv"));
         this.owner = data.getUniqueId("Owner");
+        if (data.contains("Title", Constants.NBT.TAG_STRING)) {
+            this.title = ITextComponent.Serializer.fromJson(data.getString("Title"));
+        }
+    }
+
+    @Override
+    public ITextComponent getName() {
+        return this.title == null ? AnchorContainer.Provider.TITLE : this.title;
+    }
+
+    @Override
+    public ITextComponent getCustomName() {
+        return this.title;
     }
 
     @Override

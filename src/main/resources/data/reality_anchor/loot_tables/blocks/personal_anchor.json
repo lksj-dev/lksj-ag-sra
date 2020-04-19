@@ -6,7 +6,13 @@
             "entries": [
                 {
                     "type": "minecraft:item",
-                    "name": "reality_anchor:personal_anchor"
+                    "name": "reality_anchor:personal_anchor",
+                    "functions": [
+                        {
+                            "function": "minecraft:copy_name",
+                            "source": "block_entity"
+                        }
+                    ]
                 }
             ]
         }

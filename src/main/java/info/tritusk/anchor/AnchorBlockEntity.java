@@ -2,6 +2,7 @@ package info.tritusk.anchor;
 
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.UUID;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -49,6 +50,8 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
 
     private AnchorType type = AnchorType.STANDARD; // As a safe-guard measure, preventing null
     private boolean isWorking;
+    
+    UUID owner = new UUID(0L, 0L);
 
     final AnchorInv inv = new AnchorInv();
     final SyncedTime timer = new SyncedTime();
@@ -93,10 +96,12 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
                     this.isWorking = true;
                     doWork((ServerWorld)this.world, this.pos, true);
                 } else if (this.inv.content.getCount() > 0) {
-                    this.inv.content.shrink(1);
-                    this.timer.timeRemain += 864000;
-                    this.isWorking = true;
-                    doWork((ServerWorld)this.world, this.pos, true);
+                    if (this.type != AnchorType.PERSONAL || this.world.getServer().getPlayerList().getPlayerByUUID(this.owner) != null) {
+                        this.inv.content.shrink(1);
+                        this.timer.timeRemain += 864000;
+                        this.isWorking = true;
+                        doWork((ServerWorld)this.world, this.pos, true);
+                    }
                 }
             }
         }
@@ -115,6 +120,7 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
         data.putString("Type", this.type.name);
         data.putLong("TimeRemain", this.timer.timeRemain);
         data.put("Inv", this.inv.content.write(new CompoundNBT()));
+        data.putUniqueId("Owner", this.owner);
         return super.write(data);
     }
 
@@ -124,6 +130,7 @@ public final class AnchorBlockEntity extends TileEntity implements ITickableTile
         this.type = AnchorType.find(data.getString("Type"));
         this.timer.timeRemain = data.getLong("TimeRemain");
         this.inv.content = ItemStack.read(data.getCompound("Inv"));
+        this.owner = data.getUniqueId("Owner");
     }
 
     @Override

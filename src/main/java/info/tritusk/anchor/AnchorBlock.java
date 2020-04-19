@@ -2,8 +2,10 @@ package info.tritusk.anchor;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -30,6 +32,18 @@ public final class AnchorBlock extends Block {
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
         return new AnchorBlockEntity(this.type);
+    }
+
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        if (!world.isRemote) {
+            TileEntity tile = world.getTileEntity(pos);
+            if (tile instanceof AnchorBlockEntity) {
+                if (placer instanceof PlayerEntity) {
+                    ((AnchorBlockEntity)tile).owner = ((PlayerEntity)placer).getUniqueID();
+                }
+            }
+        }
     }
 
     @Override

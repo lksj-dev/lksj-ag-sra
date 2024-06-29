@@ -26,8 +26,10 @@ import net.minecraftforge.items.CapabilityItemHandler;
 public final class AnchorBlockEntity extends TileEntity implements INameable, ITickableTileEntity {
 
     public static TileEntityType<AnchorBlockEntity> TYPE;
-
-    public static final TicketType<ChunkPos> ANCHOR = TicketType.create("reality_anchor", Comparator.comparingLong(ChunkPos::asLong));
+    /* Note: https://github.com/mekanism/Mekanism/blob/1.15x/src/main/java/mekanism/common/chunkloading/ChunkManager.java#L94-L104
+     * Need investigation
+     */
+    public static final TicketType<ChunkPos> ANCHOR = TicketType.create("reality_anchor:anchor", Comparator.comparingLong(ChunkPos::asLong));
 
     static final class SyncedTime implements IIntArray {
 

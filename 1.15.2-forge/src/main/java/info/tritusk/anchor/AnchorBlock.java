@@ -1,6 +1,7 @@
 package info.tritusk.anchor;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,6 +12,7 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -22,6 +24,11 @@ public final class AnchorBlock extends Block {
     public AnchorBlock(AnchorType type, Properties properties) {
         super(properties);
         this.type = type;
+    }
+
+    @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.ENTITYBLOCK_ANIMATED;
     }
 
     @Override
@@ -67,9 +74,12 @@ public final class AnchorBlock extends Block {
     public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
         super.onReplaced(state, world, pos, newState, isMoving);
         if (world instanceof ServerWorld) {
+            if (this.type.passive) {
+                AnchorMod.transientAnchors.remove(GlobalPos.of(world.getDimension().getType(), pos));
+            }
+            AnchorBlockEntity.doWork((ServerWorld) world, pos, false);
             TileEntity tile = world.getTileEntity(pos);
             if (tile instanceof AnchorBlockEntity) {
-                AnchorBlockEntity.doWork((ServerWorld) world, pos, false);
                 InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), ((AnchorBlockEntity)tile).inv.content);
             }
         }

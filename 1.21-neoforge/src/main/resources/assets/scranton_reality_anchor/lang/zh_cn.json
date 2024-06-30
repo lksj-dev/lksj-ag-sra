@@ -1,0 +1,10 @@
+{
+    "block.reality_anchor.standard_anchor": "斯克兰顿现实稳定锚",
+    "block.reality_anchor.personal_anchor": "个人版斯克兰顿现实稳定锚",
+    "block.reality_anchor.passive_anchor": "被动版斯克兰顿现实稳定锚",
+    "block.reality_anchor.admin_anchor": "4 级许可斯克兰顿现实稳定锚",
+
+    "gui.reality_anchor.title": "斯克兰顿现实稳定锚操作终端",
+    "gui.reality_anchor.time_remain_1": "剩余时间：",
+    "gui.reality_anchor.time_remain_2": "%s 小时"
+}

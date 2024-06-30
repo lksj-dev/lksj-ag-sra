@@ -1,0 +1,16 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license='CC0-1.0'
+
+[[mods]]
+modId="scranton_reality_anchor"
+version="${file.jarVersion}"
+displayName="Scaranton Reality Anchor"
+displayURL="https://ag.lksj.dev/"
+# logoFile="examplemod.png"
+
+credits="Dr. Scranton for invention of S.R.A.; Railcraft for inspiration"
+
+authors="3TUSK"
+
+description="Chunk loaders powered by The Foundation."

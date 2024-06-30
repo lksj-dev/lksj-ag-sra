@@ -1,0 +1,10 @@
+{
+    "block.scranton_reality_anchor.standard_anchor": "Scranton Reality Anchor",
+    "block.scranton_reality_anchor.personal_anchor": "Personal Scranton Reality Anchor",
+    "block.scranton_reality_anchor.passive_anchor": "Passive Scranton Reality Anchor",
+    "block.scranton_reality_anchor.o5_anchor": "O5 Scranton Reality Anchor",
+
+    "gui.reality_anchor.title": "S.R.A. Operation Terminal",
+    "gui.reality_anchor.time_remain_1": "Remaining Time: ",
+    "gui.reality_anchor.time_remain_2": "%s h"
+}
